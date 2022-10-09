@@ -35,16 +35,16 @@ import retrofit2.Response
 class OverviewViewModel : ViewModel() {
 
     // The internal MutableLiveData String that stores the status of the most recent request
-    private val _status = MutableLiveData<String>()
+    private val _status = MutableLiveData<MarsApiStatus>()
 
     // The external immutable LiveData for the request status String
-    val status: LiveData<String>
+    val status: LiveData<MarsApiStatus>
         get() = _status
 
 
-    private val _property = MutableLiveData<MarsPropertyItem>()
-    val property: LiveData<MarsPropertyItem>
-        get() = _property
+    private val _properties = MutableLiveData<List<MarsPropertyItem>>()
+    val properties: LiveData<List<MarsPropertyItem>>
+        get() = _properties
 
     /**
      * Call getMarsRealEstateProperties() on init so we can display status immediately.
@@ -59,15 +59,23 @@ class OverviewViewModel : ViewModel() {
     private fun getMarsRealEstateProperties() {
 
         viewModelScope.launch {
+            _status.value = MarsApiStatus.LOADING
+
             try {
-                var listResult = MarsApi.retrofitService.getProperties()
+                val listResult = MarsApi.retrofitService.getProperties()
+                _status.value = MarsApiStatus.DONE
+
                 if (listResult.size > 0) {
-                    _property.value = listResult[0]
-                }            } catch (e: Exception) {
-                _status.value = "Failure: ${e.message}"
+                    _properties.value = listResult
+                }
+            } catch (e: Exception) {
+                _status.value = MarsApiStatus.ERROR
+
+                _properties.value = ArrayList()
             }
         }
     }
 }
 
 
+enum class MarsApiStatus { LOADING, ERROR, DONE }
