@@ -16,23 +16,16 @@
  */
 
 package com.example.android.marsrealestate.overview
-
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.android.marsrealestate.network.MarsApi
-import com.example.android.marsrealestate.network.MarsProperty
 import com.example.android.marsrealestate.network.MarsPropertyItem
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+
 
 /**
  * The [ViewModel] that is attached to the [OverviewFragment].
  */
-class OverviewViewModel : ViewModel() {
+class OverviewViewModel:ViewModel(){
 
     // The internal MutableLiveData String that stores the status of the most recent request
     private val _status = MutableLiveData<MarsApiStatus>()
@@ -46,6 +39,11 @@ class OverviewViewModel : ViewModel() {
     val properties: LiveData<List<MarsPropertyItem>>
         get() = _properties
 
+
+    private val _navigateToSelectedProperty = MutableLiveData<MarsPropertyItem>()
+
+    val navigateToSelectedProperty: LiveData<MarsPropertyItem>
+        get() = _navigateToSelectedProperty
     /**
      * Call getMarsRealEstateProperties() on init so we can display status immediately.
      */
@@ -75,6 +73,15 @@ class OverviewViewModel : ViewModel() {
             }
         }
     }
+
+
+    fun displayPropertyDetails(marsProperty: MarsPropertyItem) {
+        _navigateToSelectedProperty.value = marsProperty
+    }
+    fun displayPropertyDetailsComplete() {
+        _navigateToSelectedProperty.value = null
+    }
+
 }
 
 
